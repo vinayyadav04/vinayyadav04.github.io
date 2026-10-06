@@ -400,18 +400,25 @@ async function handleFormSubmit(event) {
 
   try {
     const formData = new FormData(form);
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
     const response = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
-      body: formData
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: json
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (data.success) {
+    if (response.status === 200 || result.success) {
       form.reset();
-      showToast("Thank you! Your message was sent directly to Vinay's email.", "success");
+      showToast("Message sent successfully! Please check your inbox / spam.", "success");
     } else {
-      showToast(data.message || "Failed to send message. Please email directly.", "error");
+      showToast(result.message || "Submission failed. Please email directly.", "error");
     }
   } catch (error) {
     showToast("Network error. Please email vinayyadav04091999@gmail.com directly.", "error");
