@@ -386,8 +386,8 @@ if (copyCodeBtn) {
   });
 }
 
-// Contact Form Submission Handler
-function handleFormSubmit(event) {
+// Contact Form Submission Handler (Live Web3Forms Integration)
+async function handleFormSubmit(event) {
   event.preventDefault();
   const submitBtn = document.getElementById("submitBtn");
   const form = document.getElementById("contactForm");
@@ -398,12 +398,27 @@ function handleFormSubmit(event) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Sending...</span>`;
 
-  setTimeout(() => {
+  try {
+    const formData = new FormData(form);
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      form.reset();
+      showToast("Thank you! Your message was sent directly to Vinay's email.", "success");
+    } else {
+      showToast(data.message || "Failed to send message. Please email directly.", "error");
+    }
+  } catch (error) {
+    showToast("Network error. Please email vinayyadav04091999@gmail.com directly.", "error");
+  } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalContent;
-    form.reset();
-    showToast("Thank you, Vinay has received your message and will reply shortly!");
-  }, 1200);
+  }
 }
 
 // Initialize on DOM Load
